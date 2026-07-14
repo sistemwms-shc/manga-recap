@@ -13,6 +13,8 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
   const [previews, setPreviews] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
   const [language, setLanguage] = useState<'id' | 'en'>('id');
+  const [customNarration, setCustomNarration] = useState<string>('');
+  const [useCustomNarration, setUseCustomNarration] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +45,11 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
       return;
     }
 
+    if (useCustomNarration && customNarration.trim().length < 10) {
+      setError('Please enter a narration script (at least 10 characters)');
+      return;
+    }
+
     setIsProcessing(true);
     setError('');
 
@@ -52,6 +59,11 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
         formData.append(`image_${index}`, image);
       });
       formData.append('language', language);
+      
+      // Add custom narration if provided
+      if (useCustomNarration && customNarration.trim()) {
+        formData.append('customNarration', customNarration.trim());
+      }
 
       const response = await fetch('/api/generate-recap', {
         method: 'POST',
@@ -149,6 +161,58 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
       {/* Generate Button */}
       {images.length > 0 && (
         <>
+          {/* Custom Narration Toggle */}
+          <div className="mb-4 p-4 bg-green-50 dark:bg-green-900 dark:bg-opacity-20 rounded-lg">
+            <div className="flex items-center gap-3 mb-3">
+              <input
+                type="checkbox"
+                id="useCustomNarration"
+                checked={useCustomNarration}
+                onChange={(e) => setUseCustomNarration(e.target.checked)}
+                className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
+              />
+              <label htmlFor="useCustomNarration" className="font-semibold text-gray-900 dark:text-white cursor-pointer">
+                📝 Use Custom Narration Script (Your Own Story)
+              </label>
+            </div>
+            
+            {useCustomNarration && (
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Paste Your Narration Script:
+                </label>
+                <textarea
+                  value={customNarration}
+                  onChange={(e) => setCustomNarration(e.target.value)}
+                  placeholder={language === 'id' 
+                    ? "Contoh: Di balik layar malam jadi terang, protagonis menghadapi parasit mengerikan yang menginfeksi kota. Gelombang panas yang sangat ekstrem sedang melanda kota. Suhu mencapai 52 derajat celcius..."
+                    : "Example: Behind the scenes, night becomes bright, the protagonist faces terrifying parasites infecting the city. An extremely hot heat wave is hitting the city. The temperature reaches 52 degrees celsius..."
+                  }
+                  rows={6}
+                  className="w-full px-4 py-3 border-2 border-green-300 dark:border-green-700 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:text-white resize-vertical"
+                />
+                <div className="mt-2 text-xs text-green-700 dark:text-green-400">
+                  💡 {language === 'id' 
+                    ? 'Tulis cerita manga Anda sendiri! Narasi ini akan dibacakan oleh AI saat video diputar.'
+                    : 'Write your own manga story! This narration will be spoken by AI when the video plays.'
+                  }
+                </div>
+                <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                  Characters: {customNarration.length}
+                </div>
+              </div>
+            )}
+            
+            {!useCustomNarration && (
+              <p className="text-sm text-green-700 dark:text-green-400 mt-2">
+                ℹ️ {language === 'id'
+                  ? 'Jika tidak dicentang, AI akan membuat narasi otomatis berdasarkan gambar.'
+                  : 'If unchecked, AI will generate narration automatically based on images.'
+                }
+              </p>
+            )}
+          </div>
+
           {/* Language Selection */}
           <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h3 className="font-semibold mb-3 dark:text-white">🎙️ Narration Language:</h3>

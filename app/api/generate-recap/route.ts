@@ -8,13 +8,16 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const images: File[] = [];
     let language: 'id' | 'en' = 'id';
+    let customNarration: string | null = null;
 
-    // Extract all images and language from formData
+    // Extract all images, language, and custom narration from formData
     for (const [key, value] of formData.entries()) {
       if (key.startsWith('image_') && value instanceof File) {
         images.push(value);
       } else if (key === 'language') {
         language = value as 'id' | 'en';
+      } else if (key === 'customNarration') {
+        customNarration = value as string;
       }
     }
 
@@ -25,13 +28,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Step 1: Analyze images with AI to extract story/dialogue
-    console.log(`Analyzing images in ${language}...`);
-    const analysis = await analyzeImages(images, language);
+    let narrativeText: string;
 
-    // Step 2: Generate narration audio from the analysis
+    // Use custom narration if provided, otherwise use AI analysis
+    if (customNarration && customNarration.trim().length > 0) {
+      console.log('Using custom narration provided by user');
+      narrativeText = customNarration.trim();
+    } else {
+      // Step 1: Analyze images with AI to extract story/dialogue
+      console.log(`Analyzing images in ${language}...`);
+      const analysis = await analyzeImages(images, language);
+      narrativeText = analysis.narrative;
+    }
+
+    // Step 2: Generate narration audio from the narrative
     console.log('Generating narration...');
-    const audioPath = await generateNarration(analysis.narrative, language);
+    const audioPath = await generateNarration(narrativeText, language);
 
     // Step 3: Create video from images + audio
     console.log('Creating video...');
@@ -40,8 +52,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       videoUrl: videoPath,
-      analysis: analysis.narrative,
+      analysis: narrativeText,
       language,
+      customNarration: customNarration ? true : false,
     });
   } catch (error: any) {
     console.error('Error generating recap:', error);

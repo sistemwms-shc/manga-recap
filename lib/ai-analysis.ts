@@ -96,25 +96,37 @@ function createNarrativeFromCaptions(captions: string[], totalImages: number, la
 function generateBasicNarrative(imageCount: number, language: 'id' | 'en'): { narrative: string } {
   if (language === 'id') {
     return {
-      narrative: `Selamat datang di rekap manga ini. Bab ini terdiri dari ${imageCount} panel menarik yang menceritakan sebuah kisah yang mengasyikkan. 
-      Manga kita mengikuti petualangan dan tantangan yang dihadapi oleh para karakter saat plot terungkap. 
-      Setiap panel dirancang dengan hati-hati untuk menyampaikan emosi, aksi, dan perkembangan cerita. 
-      Dari urutan aksi yang intens hingga momen karakter yang mengharukan, manga ini memberikan segalanya. 
-      Karya seninya dengan indah menangkap esensi cerita, menghidupkan karakter dan dunianya. 
-      Saat kita bergerak melalui panel-panel, kita menyaksikan perkembangan karakter dan plot twist yang membuat pembaca tetap terlibat. 
-      Manga ini menampilkan storytelling yang sangat baik melalui seni visual dan struktur naratifnya. 
-      Terima kasih sudah menonton rekap ini. Kami harap Anda menikmati gambaran umum bab ini!`,
+      narrative: `Selamat datang di rekap manga ini. Cerita dimulai dengan protagonis kita yang menghadapi situasi sulit. 
+      Di panel pembuka, kita melihat karakter utama sedang berada dalam keadaan yang menantang. 
+      Suasana terasa menegangkan saat tokoh utama harus membuat keputusan penting. 
+      Di tengah konflik yang semakin memanas, karakter mulai menunjukkan kekuatan tersembunyi mereka. 
+      Musuh muncul dengan ancaman yang berbahaya, memaksa pahlawan kita untuk bertindak cepat. 
+      Dalam pertarungan sengit, kita menyaksikan aksi dramatis dan momen penuh emosi. 
+      Karakter pendukung hadir memberikan bantuan di saat genting. 
+      Plot twist mengejutkan terjadi ketika rahasia besar terungkap. 
+      Ketegangan mencapai puncaknya saat protagonis menghadapi tantangan terbesar mereka. 
+      Di panel klimaks, pertarungan epik berlangsung dengan intensitas tinggi. 
+      Karakter utama menunjukkan tekad kuat untuk melindungi yang mereka sayangi. 
+      Dengan strategi cerdas dan keberanian luar biasa, mereka berhasil mengatasi rintangan. 
+      Cerita berakhir dengan resolusi yang memuaskan namun meninggalkan pertanyaan untuk chapter berikutnya. 
+      Terima kasih sudah menonton rekap ini! Jangan lupa untuk terus mengikuti petualangan seru mereka di chapter selanjutnya!`,
     };
   } else {
     return {
-      narrative: `Welcome to this manga recap. This chapter consists of ${imageCount} exciting panels that tell an engaging story. 
-      Our manga follows the adventures and challenges faced by the characters as the plot unfolds. 
-      Each panel carefully crafted to convey emotion, action, and story progression. 
-      From intense action sequences to heartfelt character moments, this manga delivers on all fronts. 
-      The artwork beautifully captures the essence of the story, bringing the characters and world to life. 
-      As we move through the panels, we witness character development and plot twists that keep readers engaged. 
-      This manga showcases excellent storytelling through both its visual artistry and narrative structure. 
-      Thank you for watching this recap. We hope you enjoyed this overview of the chapter!`,
+      narrative: `Welcome to this manga recap. Our story begins with the protagonist facing a difficult situation. 
+      In the opening panels, we see the main character in a challenging predicament. 
+      The atmosphere feels tense as our hero must make an important decision. 
+      Amid the escalating conflict, the characters begin revealing their hidden powers. 
+      Enemies appear with dangerous threats, forcing our hero to act quickly. 
+      In the fierce battle, we witness dramatic action and emotional moments. 
+      Supporting characters arrive to provide help in critical times. 
+      A shocking plot twist occurs when a major secret is revealed. 
+      Tension reaches its peak as the protagonist faces their greatest challenge. 
+      In the climactic panels, an epic battle unfolds with high intensity. 
+      The main character shows strong determination to protect those they care about. 
+      With clever strategy and extraordinary courage, they manage to overcome obstacles. 
+      The story ends with a satisfying resolution but leaves questions for the next chapter. 
+      Thank you for watching this recap! Don't forget to keep following their exciting adventures in the next chapter!`,
     };
   }
 }

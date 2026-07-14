@@ -23,8 +23,8 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
       return;
     }
 
-    if (imageFiles.length > 20) {
-      setError('Maximum 20 images allowed');
+    if (imageFiles.length > 50) {
+      setError('Maximum 50 images allowed');
       return;
     }
 
@@ -101,7 +101,7 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
             <div className="text-4xl mb-2">📁</div>
             <p className="text-lg font-semibold dark:text-white">Click to upload manga images</p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              PNG, JPG, JPEG (Max 20 images)
+              PNG, JPG, JPEG (Max 50 images)
             </p>
           </div>
         </button>

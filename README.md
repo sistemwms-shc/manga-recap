@@ -96,7 +96,7 @@ GOOGLE_TTS_API_KEY=your_key_here
 
 1. **Upload Images**
    - Click the upload area
-   - Select manga/manhwa images (up to 20)
+   - Select manga/manhwa images (up to 50)
    - Images should be in reading order
 
 2. **Generate Video**
@@ -206,7 +206,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 🐛 Known Issues & Limitations
 
-- Maximum 20 images per upload (can be adjusted in code)
+- Maximum 50 images per upload (can be adjusted in code)
 - Video generation requires sufficient server resources
 - Free API tiers have rate limits
 - Some features require API keys for full functionality

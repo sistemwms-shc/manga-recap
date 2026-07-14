@@ -7,11 +7,14 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const images: File[] = [];
+    let language: 'id' | 'en' = 'id';
 
-    // Extract all images from formData
+    // Extract all images and language from formData
     for (const [key, value] of formData.entries()) {
       if (key.startsWith('image_') && value instanceof File) {
         images.push(value);
+      } else if (key === 'language') {
+        language = value as 'id' | 'en';
       }
     }
 
@@ -23,21 +26,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 1: Analyze images with AI to extract story/dialogue
-    console.log('Analyzing images...');
-    const analysis = await analyzeImages(images);
+    console.log(`Analyzing images in ${language}...`);
+    const analysis = await analyzeImages(images, language);
 
     // Step 2: Generate narration audio from the analysis
     console.log('Generating narration...');
-    const audioPath = await generateNarration(analysis.narrative);
+    const audioPath = await generateNarration(analysis.narrative, language);
 
     // Step 3: Create video from images + audio
     console.log('Creating video...');
-    const videoPath = await createVideo(images, audioPath);
+    const videoPath = await createVideo(images, audioPath, language);
 
     return NextResponse.json({
       success: true,
       videoUrl: videoPath,
       analysis: analysis.narrative,
+      language,
     });
   } catch (error: any) {
     console.error('Error generating recap:', error);

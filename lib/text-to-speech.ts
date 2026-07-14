@@ -6,7 +6,7 @@ import path from 'path';
  * For now, we'll save the narrative text for future audio integration
  */
 
-export async function generateNarration(text: string): Promise<string> {
+export async function generateNarration(text: string, language: 'id' | 'en' = 'id'): Promise<string> {
   try {
     const publicDir = path.join(process.cwd(), 'public', 'temp');
     
@@ -16,11 +16,16 @@ export async function generateNarration(text: string): Promise<string> {
     }
 
     const timestamp = Date.now();
-    const textFileName = `narration_${timestamp}.txt`;
+    const textFileName = `narration_${language}_${timestamp}.txt`;
     const textPath = path.join(publicDir, textFileName);
     
-    // Save the narrative text
-    fs.writeFileSync(textPath, text, 'utf-8');
+    // Save the narrative text with language indicator
+    const narrationData = {
+      text,
+      language,
+      timestamp,
+    };
+    fs.writeFileSync(textPath, JSON.stringify(narrationData, null, 2), 'utf-8');
     
     return `/temp/${textFileName}`;
   } catch (error) {

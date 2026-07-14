@@ -2,11 +2,11 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * Video Generation - Simplified version that saves images for client-side slideshow
- * Creates a JSON manifest and saves images that can be played as a slideshow
+ * Video Generation - Creates manifest for 9:16 vertical video with zoom/pan effects
+ * Output: 1080x1920 (perfect for TikTok, Instagram Reels, YouTube Shorts)
  */
 
-export async function createVideo(images: File[], audioPath: string): Promise<string> {
+export async function createVideo(images: File[], audioPath: string, language: 'id' | 'en' = 'id'): Promise<string> {
   try {
     const publicDir = path.join(process.cwd(), 'public', 'temp');
     
@@ -34,7 +34,18 @@ export async function createVideo(images: File[], audioPath: string): Promise<st
       imageCount: images.length,
       images: imagePaths,
       audioPath,
+      language,
       duration: images.length * 3, // 3 seconds per image
+      resolution: {
+        width: 1080,
+        height: 1920,
+        ratio: '9:16',
+      },
+      effects: {
+        zoom: true,
+        pan: true,
+        transitions: true,
+      },
     };
 
     const manifestPath = path.join(publicDir, `${videoId}_manifest.json`);

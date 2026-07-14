@@ -12,6 +12,7 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [error, setError] = useState<string>('');
+  const [language, setLanguage] = useState<'id' | 'en'>('id');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,6 +51,7 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
       images.forEach((image, index) => {
         formData.append(`image_${index}`, image);
       });
+      formData.append('language', language);
 
       const response = await fetch('/api/generate-recap', {
         method: 'POST',
@@ -146,13 +148,44 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
 
       {/* Generate Button */}
       {images.length > 0 && (
-        <button
-          onClick={handleGenerate}
-          disabled={isProcessing}
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isProcessing ? 'Generating...' : '🎬 Generate Video Recap'}
-        </button>
+        <>
+          {/* Language Selection */}
+          <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <h3 className="font-semibold mb-3 dark:text-white">🎙️ Narration Language:</h3>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setLanguage('id')}
+                disabled={isProcessing}
+                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
+                  language === 'id'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500'
+                }`}
+              >
+                🇮🇩 Bahasa Indonesia
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                disabled={isProcessing}
+                className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
+                  language === 'en'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200 border-2 border-gray-300 dark:border-gray-500'
+                }`}
+              >
+                🇬🇧 English
+              </button>
+            </div>
+          </div>
+
+          <button
+            onClick={handleGenerate}
+            disabled={isProcessing}
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-6 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isProcessing ? 'Generating...' : '🎬 Generate 9:16 Video with Narration'}
+          </button>
+        </>
       )}
 
       {/* Info Box */}
@@ -161,7 +194,9 @@ export default function MangaUploader({ onVideoGenerated, isProcessing, setIsPro
         <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
           <li>• Upload images in reading order for best results</li>
           <li>• Clear, high-quality images work best</li>
-          <li>• Processing takes 1-2 minutes depending on image count</li>
+          <li>• Video will be 1080x1920 (9:16 vertical format - perfect for TikTok/Reels!)</li>
+          <li>• Includes zoom & pan effects for dynamic viewing</li>
+          <li>• AI narration in your selected language</li>
         </ul>
       </div>
     </div>

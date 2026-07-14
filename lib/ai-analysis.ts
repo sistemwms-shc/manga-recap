@@ -6,7 +6,7 @@
  * 3. Google Gemini (Free tier)
  */
 
-export async function analyzeImages(images: File[]): Promise<{ narrative: string }> {
+export async function analyzeImages(images: File[], language: 'id' | 'en' = 'id'): Promise<{ narrative: string }> {
   try {
     // Convert images to base64 for analysis
     const imageDataArray = await Promise.all(
@@ -55,49 +55,72 @@ export async function analyzeImages(images: File[]): Promise<{ narrative: string
     }
 
     // Create narrative from captions
-    const narrative = createNarrativeFromCaptions(captions, images.length);
+    const narrative = createNarrativeFromCaptions(captions, images.length, language);
     return { narrative };
   } catch (error) {
     console.error('Error in AI analysis:', error);
-    return generateBasicNarrative(images.length);
+    return generateBasicNarrative(images.length, language);
   }
 }
 
-function createNarrativeFromCaptions(captions: string[], totalImages: number): string {
+function createNarrativeFromCaptions(captions: string[], totalImages: number, language: 'id' | 'en'): string {
   if (captions.length === 0) {
-    return generateBasicNarrative(totalImages).narrative;
+    return generateBasicNarrative(totalImages, language).narrative;
   }
 
-  let narrative = "Welcome to this manga recap. ";
+  let narrative = '';
   
-  captions.forEach((caption, index) => {
-    narrative += `In panel ${index + 1}, ${caption}. `;
-  });
-  
-  if (totalImages > captions.length) {
-    narrative += `The story continues through ${totalImages - captions.length} more exciting panels. `;
+  if (language === 'id') {
+    narrative = "Selamat datang di rekap manga ini. ";
+    captions.forEach((caption, index) => {
+      narrative += `Di panel ${index + 1}, ${caption}. `;
+    });
+    if (totalImages > captions.length) {
+      narrative += `Cerita berlanjut melalui ${totalImages - captions.length} panel menarik lainnya. `;
+    }
+    narrative += "Ini mengakhiri rekap manga kita. Terima kasih sudah menonton!";
+  } else {
+    narrative = "Welcome to this manga recap. ";
+    captions.forEach((caption, index) => {
+      narrative += `In panel ${index + 1}, ${caption}. `;
+    });
+    if (totalImages > captions.length) {
+      narrative += `The story continues through ${totalImages - captions.length} more exciting panels. `;
+    }
+    narrative += "This concludes our manga recap. Thank you for watching!";
   }
-  
-  narrative += "This concludes our manga recap. Thank you for watching!";
   
   return narrative;
 }
 
-function generateBasicNarrative(imageCount: number): { narrative: string } {
-  return {
-    narrative: `Welcome to this manga recap. This chapter consists of ${imageCount} exciting panels that tell an engaging story. 
-    Our manga follows the adventures and challenges faced by the characters as the plot unfolds. 
-    Each panel carefully crafted to convey emotion, action, and story progression. 
-    From intense action sequences to heartfelt character moments, this manga delivers on all fronts. 
-    The artwork beautifully captures the essence of the story, bringing the characters and world to life. 
-    As we move through the panels, we witness character development and plot twists that keep readers engaged. 
-    This manga showcases excellent storytelling through both its visual artistry and narrative structure. 
-    Thank you for watching this recap. We hope you enjoyed this overview of the chapter!`,
-  };
+function generateBasicNarrative(imageCount: number, language: 'id' | 'en'): { narrative: string } {
+  if (language === 'id') {
+    return {
+      narrative: `Selamat datang di rekap manga ini. Bab ini terdiri dari ${imageCount} panel menarik yang menceritakan sebuah kisah yang mengasyikkan. 
+      Manga kita mengikuti petualangan dan tantangan yang dihadapi oleh para karakter saat plot terungkap. 
+      Setiap panel dirancang dengan hati-hati untuk menyampaikan emosi, aksi, dan perkembangan cerita. 
+      Dari urutan aksi yang intens hingga momen karakter yang mengharukan, manga ini memberikan segalanya. 
+      Karya seninya dengan indah menangkap esensi cerita, menghidupkan karakter dan dunianya. 
+      Saat kita bergerak melalui panel-panel, kita menyaksikan perkembangan karakter dan plot twist yang membuat pembaca tetap terlibat. 
+      Manga ini menampilkan storytelling yang sangat baik melalui seni visual dan struktur naratifnya. 
+      Terima kasih sudah menonton rekap ini. Kami harap Anda menikmati gambaran umum bab ini!`,
+    };
+  } else {
+    return {
+      narrative: `Welcome to this manga recap. This chapter consists of ${imageCount} exciting panels that tell an engaging story. 
+      Our manga follows the adventures and challenges faced by the characters as the plot unfolds. 
+      Each panel carefully crafted to convey emotion, action, and story progression. 
+      From intense action sequences to heartfelt character moments, this manga delivers on all fronts. 
+      The artwork beautifully captures the essence of the story, bringing the characters and world to life. 
+      As we move through the panels, we witness character development and plot twists that keep readers engaged. 
+      This manga showcases excellent storytelling through both its visual artistry and narrative structure. 
+      Thank you for watching this recap. We hope you enjoyed this overview of the chapter!`,
+    };
+  }
 }
 
 // Alternative: OpenAI Vision API (requires API key)
-export async function analyzeWithOpenAI(images: File[]): Promise<{ narrative: string }> {
+export async function analyzeWithOpenAI(images: File[], language: 'id' | 'en'): Promise<{ narrative: string }> {
   const apiKey = process.env.OPENAI_API_KEY;
   
   if (!apiKey) {
@@ -132,7 +155,9 @@ export async function analyzeWithOpenAI(images: File[]): Promise<{ narrative: st
           content: [
             {
               type: 'text',
-              text: 'Analyze these manga panels and create a cohesive narrative recap for a video. Focus on the story, characters, and key events. Make it engaging for viewers.',
+              text: language === 'id' 
+                ? 'Analisis panel manga ini dan buat narasi rekap yang kohesif untuk video. Fokus pada cerita, karakter, dan peristiwa kunci. Buat menarik untuk penonton. Gunakan Bahasa Indonesia.'
+                : 'Analyze these manga panels and create a cohesive narrative recap for a video. Focus on the story, characters, and key events. Make it engaging for viewers.',
             },
             ...imageDataArray,
           ],

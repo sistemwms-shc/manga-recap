@@ -13,13 +13,25 @@ interface VideoManifest {
   imageCount: number;
   images: string[];
   audioPath: string;
+  language: 'id' | 'en';
   duration: number;
+  resolution: {
+    width: number;
+    height: number;
+    ratio: string;
+  };
+  effects: {
+    zoom: boolean;
+    pan: boolean;
+    transitions: boolean;
+  };
 }
 
 export default function VideoPlayer({ videoUrl, onReset }: VideoPlayerProps) {
   const [manifest, setManifest] = useState<VideoManifest | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [narration, setNarration] = useState<string>('');
 
   useEffect(() => {
     // Load the video manifest
@@ -28,6 +40,16 @@ export default function VideoPlayer({ videoUrl, onReset }: VideoPlayerProps) {
       .then(data => {
         setManifest(data);
         setIsPlaying(true);
+        
+        // Load narration text
+        if (data.audioPath) {
+          fetch(data.audioPath)
+            .then(res => res.json())
+            .then(narrationData => {
+              setNarration(narrationData.text || '');
+            })
+            .catch(err => console.error('Error loading narration:', err));
+        }
       })
       .catch(err => console.error('Error loading video:', err));
   }, [videoUrl]);
@@ -93,13 +115,24 @@ export default function VideoPlayer({ videoUrl, onReset }: VideoPlayerProps) {
         </button>
       </div>
 
-      {/* Slideshow Player */}
-      <div className="relative bg-black rounded-lg overflow-hidden mb-6" style={{ minHeight: '500px' }}>
+      {/* Slideshow Player - 9:16 aspect ratio */}
+      <div className="relative bg-black rounded-lg overflow-hidden mb-6 mx-auto" style={{ maxWidth: '540px', aspectRatio: '9/16' }}>
         <img
           src={manifest.images[currentImageIndex]}
           alt={`Manga panel ${currentImageIndex + 1}`}
-          className="w-full h-auto max-h-[600px] object-contain"
+          className="w-full h-full object-cover"
+          style={{ objectFit: 'cover' }}
         />
+        
+        {/* Video Format Badge */}
+        <div className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          {manifest.resolution.width}×{manifest.resolution.height} ({manifest.resolution.ratio})
+        </div>
+        
+        {/* Language Badge */}
+        <div className="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          {manifest.language === 'id' ? '🇮🇩 Bahasa Indonesia' : '🇬🇧 English'}
+        </div>
         
         {/* Progress indicator */}
         <div className="absolute bottom-4 left-4 right-4 bg-black bg-opacity-70 rounded p-3">
@@ -145,16 +178,39 @@ export default function VideoPlayer({ videoUrl, onReset }: VideoPlayerProps) {
         </button>
       </div>
 
-      {/* Info Section */}
-      <div className="p-4 bg-purple-50 dark:bg-purple-900 dark:bg-opacity-20 rounded-lg">
+      {/* Info Section with Narration */}
+      <div className="p-4 bg-purple-50 dark:bg-purple-900 dark:bg-opacity-20 rounded-lg mb-4">
         <h3 className="font-semibold text-purple-900 dark:text-purple-300 mb-2">
-          🎉 Slideshow Generated Successfully!
+          🎉 Video Generated Successfully!
         </h3>
-        <p className="text-sm text-purple-800 dark:text-purple-400">
-          Your manga recap is ready! Watch the automatic slideshow or use the controls to navigate manually.
-          Each panel displays for 3 seconds.
+        <p className="text-sm text-purple-800 dark:text-purple-400 mb-3">
+          Your manga recap is ready with {manifest.resolution.ratio} vertical format (perfect for TikTok, Instagram Reels, YouTube Shorts)!
         </p>
+        <div className="flex flex-wrap gap-2">
+          <span className="px-3 py-1 bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-200 rounded-full text-xs font-semibold">
+            ✨ Zoom Effects
+          </span>
+          <span className="px-3 py-1 bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-200 rounded-full text-xs font-semibold">
+            📱 Pan Animation
+          </span>
+          <span className="px-3 py-1 bg-purple-200 dark:bg-purple-800 text-purple-900 dark:text-purple-200 rounded-full text-xs font-semibold">
+            🎙️ AI Narration
+          </span>
+        </div>
       </div>
+
+      {/* Narration Text */}
+      {narration && (
+        <div className="p-4 bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20 rounded-lg">
+          <h3 className="font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center gap-2">
+            <span>🎙️</span>
+            <span>{manifest.language === 'id' ? 'Teks Narasi' : 'Narration Text'}</span>
+          </h3>
+          <p className="text-sm text-blue-800 dark:text-blue-400 whitespace-pre-wrap">
+            {narration}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

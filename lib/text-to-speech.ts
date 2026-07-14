@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * Text-to-Speech using FREE services:
- * For now, we'll save the narrative text for future audio integration
+ * Text-to-Speech using Web Speech API (Free & Built-in)
+ * For server-side, we prepare data for client-side speech synthesis
  */
 
 export async function generateNarration(text: string, language: 'id' | 'en' = 'id'): Promise<string> {
@@ -16,18 +16,23 @@ export async function generateNarration(text: string, language: 'id' | 'en' = 'i
     }
 
     const timestamp = Date.now();
-    const textFileName = `narration_${language}_${timestamp}.txt`;
-    const textPath = path.join(publicDir, textFileName);
+    const audioFileName = `narration_${language}_${timestamp}.json`;
+    const audioPath = path.join(publicDir, audioFileName);
     
-    // Save the narrative text with language indicator
+    // Save the narrative text with Web Speech API settings
     const narrationData = {
       text,
-      language,
+      language: language === 'id' ? 'id-ID' : 'en-US', // Proper language codes for speech
       timestamp,
+      voiceSettings: {
+        rate: 0.9, // Slightly slower for clarity
+        pitch: 1.0,
+        volume: 1.0,
+      },
     };
-    fs.writeFileSync(textPath, JSON.stringify(narrationData, null, 2), 'utf-8');
+    fs.writeFileSync(audioPath, JSON.stringify(narrationData, null, 2), 'utf-8');
     
-    return `/temp/${textFileName}`;
+    return `/temp/${audioFileName}`;
   } catch (error) {
     console.error('Error saving narration:', error);
     throw new Error('Failed to save narration text');

@@ -3,42 +3,30 @@ import path from 'path';
 
 /**
  * Text-to-Speech using FREE services:
- * 1. Edge TTS (Microsoft Edge's free TTS - RECOMMENDED)
- * 2. Google Cloud TTS (Free tier: 1M chars/month)
- * 3. ElevenLabs (Free tier: 10k chars/month)
+ * For now, we'll save the narrative text for future audio integration
  */
 
 export async function generateNarration(text: string): Promise<string> {
   try {
-    // Try using a free TTS service
-    const audioPath = await generateWithFreeTTS(text);
-    return audioPath;
+    const publicDir = path.join(process.cwd(), 'public', 'temp');
+    
+    // Create temp directory if it doesn't exist
+    if (!fs.existsSync(publicDir)) {
+      fs.mkdirSync(publicDir, { recursive: true });
+    }
+
+    const timestamp = Date.now();
+    const textFileName = `narration_${timestamp}.txt`;
+    const textPath = path.join(publicDir, textFileName);
+    
+    // Save the narrative text
+    fs.writeFileSync(textPath, text, 'utf-8');
+    
+    return `/temp/${textFileName}`;
   } catch (error) {
-    console.error('Error generating narration:', error);
-    // Fallback: return a silent audio file or throw error
-    throw new Error('Failed to generate audio narration');
+    console.error('Error saving narration:', error);
+    throw new Error('Failed to save narration text');
   }
-}
-
-async function generateWithFreeTTS(text: string): Promise<string> {
-  // Using Web Speech API compatible approach
-  // For server-side, we'll use a simple text file that can be processed by client
-  
-  const publicDir = path.join(process.cwd(), 'public', 'temp');
-  
-  // Create temp directory if it doesn't exist
-  if (!fs.existsSync(publicDir)) {
-    fs.mkdirSync(publicDir, { recursive: true });
-  }
-
-  const timestamp = Date.now();
-  const audioFileName = `audio_${timestamp}.txt`;
-  const audioPath = path.join(publicDir, audioFileName);
-  
-  // Save the text for client-side TTS processing
-  fs.writeFileSync(audioPath, text, 'utf-8');
-  
-  return `/temp/${audioFileName}`;
 }
 
 // Alternative: ElevenLabs API (requires API key, free tier available)
